@@ -18,9 +18,15 @@ class ClassScheduleResource extends Resource
 {
     protected static ?string $model = ClassSchedule::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
 
     protected static ?string $recordTitleAttribute = 'horario de clases';
+
+    protected static ?string $navigationLabel = 'Horarios de clases';
+
+    protected static ?string $modelLabel = 'Horario de clase';
+
+    protected static ?string $pluralModelLabel = 'Horarios de clases';
 
     public static function form(Schema $schema): Schema
     {

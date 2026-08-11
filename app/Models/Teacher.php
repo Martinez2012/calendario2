@@ -14,12 +14,14 @@ class Teacher extends Model
         'hire_date',
     ];
 
+    protected $casts = [
+        'hire_date' => 'date',
+    ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
-
 
     public function teacherSubjectGroups()
     {

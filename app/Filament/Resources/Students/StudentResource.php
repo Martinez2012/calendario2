@@ -18,9 +18,15 @@ class StudentResource extends Resource
 {
     protected static ?string $model = Student::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
 
     protected static ?string $recordTitleAttribute = 'estudiante';
+
+    protected static ?string $navigationLabel = 'Estudiantes';
+
+    protected static ?string $modelLabel = 'Estudiante';
+
+    protected static ?string $pluralModelLabel = 'Estudiantes';
 
     public static function form(Schema $schema): Schema
     {

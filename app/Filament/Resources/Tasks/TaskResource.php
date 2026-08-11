@@ -18,9 +18,15 @@ class TaskResource extends Resource
 {
     protected static ?string $model = Task::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
 
-    protected static ?string $recordTitleAttribute = 'tareas';
+    protected static ?string $recordTitleAttribute = 'tarea';
+
+    protected static ?string $navigationLabel = 'Tareas';
+
+    protected static ?string $modelLabel = 'Tarea';
+
+    protected static ?string $pluralModelLabel = 'Tareas';
 
     public static function form(Schema $schema): Schema
     {

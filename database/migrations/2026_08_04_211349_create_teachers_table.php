@@ -12,19 +12,25 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('teachers', function (Blueprint $table) {
-
             $table->id();
+
             $table->foreignId('user_id')
                 ->unique()
                 ->constrained()
                 ->cascadeOnDelete();
 
             $table->string('document')->unique();
-            $table->string('specialty')->nullable();
-            $table->string('professional_title')->nullable();
-            $table->date('hire_date')->nullable();
-            $table->timestamps();
 
+            $table->string('specialty')
+                ->nullable();
+
+            $table->string('professional_title')
+                ->nullable();
+
+            $table->date('hire_date')
+                ->nullable();
+
+            $table->timestamps();
         });
     }
 

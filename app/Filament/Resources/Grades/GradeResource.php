@@ -18,9 +18,15 @@ class GradeResource extends Resource
 {
     protected static ?string $model = Grade::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedAcademicCap;
 
     protected static ?string $recordTitleAttribute = 'grado';
+
+    protected static ?string $navigationLabel = 'Grados';
+
+    protected static ?string $modelLabel = 'Grado';
+
+    protected static ?string $pluralModelLabel = 'Grados';
 
     public static function form(Schema $schema): Schema
     {

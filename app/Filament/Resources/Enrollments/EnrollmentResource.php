@@ -18,10 +18,15 @@ class EnrollmentResource extends Resource
 {
     protected static ?string $model = Enrollment::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentCheck;
 
     protected static ?string $recordTitleAttribute = 'inscripcion';
 
+    protected static ?string $navigationLabel = 'Inscripciones';
+
+    protected static ?string $modelLabel = 'Inscripción';
+
+    protected static ?string $pluralModelLabel = 'Inscripciones';
     public static function form(Schema $schema): Schema
     {
         return EnrollmentForm::configure($schema);

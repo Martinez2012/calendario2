@@ -18,8 +18,13 @@ class TeacherSubjectGroupResource extends Resource
 {
     protected static ?string $model = TeacherSubjectGroup::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedLink;
 
+    protected static ?string $navigationLabel = 'Asignaciones de Profesores';
+
+    protected static ?string $modelLabel = 'Asignación';
+
+    protected static ?string $pluralModelLabel = 'Asignaciones de Profesores';
     public static function form(Schema $schema): Schema
     {
         return TeacherSubjectGroupForm::configure($schema);

@@ -18,9 +18,15 @@ class StudentGradeResource extends Resource
 {
     protected static ?string $model = StudentGrade::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChartBar;
 
-    protected static ?string $recordTitleAttribute = 'celificacion del estudiante';
+    protected static ?string $recordTitleAttribute = 'calificacion_del_estudiante';
+
+    protected static ?string $navigationLabel = 'Calificaciones de Estudiantes';
+
+    protected static ?string $modelLabel = 'Calificación de Estudiante';
+
+    protected static ?string $pluralModelLabel = 'Calificaciones de Estudiantes';
 
     public static function form(Schema $schema): Schema
     {

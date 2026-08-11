@@ -14,26 +14,53 @@ class StudentsTable
     {
         return $table
             ->columns([
-                TextColumn::make('user_id')
-                    ->numeric()
+                TextColumn::make('first_name')
+                    ->label('Nombres')
+                    ->searchable()
                     ->sortable(),
+
+                TextColumn::make('last_name')
+                    ->label('Apellidos')
+                    ->searchable()
+                    ->sortable(),
+
                 TextColumn::make('student_code')
-                    ->searchable(),
-                TextColumn::make('document')
-                    ->searchable(),
-                TextColumn::make('birth_date')
-                    ->date()
+                    ->label('Código estudiantil')
+                    ->searchable()
                     ->sortable(),
+
+                TextColumn::make('document')
+                    ->label('Documento')
+                    ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('birth_date')
+                    ->label('Fecha de nacimiento')
+                    ->date('d/m/Y')
+                    ->sortable(),
+
                 TextColumn::make('guardian_name')
+                    ->label('Acudiente')
                     ->searchable(),
+
                 TextColumn::make('guardian_phone')
+                    ->label('Teléfono acudiente')
                     ->searchable(),
+
+                TextColumn::make('user.name')
+                    ->label('Usuario')
+                    ->searchable()
+                    ->sortable(),
+
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Creado')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Actualizado')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

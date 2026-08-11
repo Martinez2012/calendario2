@@ -18,10 +18,15 @@ class EventResource extends Resource
 {
     protected static ?string $model = Event::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendar;
 
     protected static ?string $recordTitleAttribute = 'eventos';
 
+    protected static ?string $navigationLabel = 'Eventos';
+
+    protected static ?string $modelLabel = 'Evento';
+
+    protected static ?string $pluralModelLabel = 'Eventos';
     public static function form(Schema $schema): Schema
     {
         return EventForm::configure($schema);

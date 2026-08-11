@@ -18,9 +18,15 @@ class TaskSubmissionResource extends Resource
 {
     protected static ?string $model = TaskSubmission::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentArrowUp;
 
-    protected static ?string $recordTitleAttribute = 'envio de la tarea';
+    protected static ?string $recordTitleAttribute = 'envio_de_la_tarea';
+
+    protected static ?string $navigationLabel = 'Entregas de Tareas';
+
+    protected static ?string $modelLabel = 'Entrega de Tarea';
+
+    protected static ?string $pluralModelLabel = 'Entregas de Tareas';
 
     public static function form(Schema $schema): Schema
     {

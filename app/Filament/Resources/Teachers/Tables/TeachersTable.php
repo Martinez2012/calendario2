@@ -14,24 +14,42 @@ class TeachersTable
     {
         return $table
             ->columns([
-                TextColumn::make('user_id')
-                    ->numeric()
+                TextColumn::make('user.name')
+                    ->label('Docente')
+                    ->searchable()
                     ->sortable(),
+
+                TextColumn::make('user.email')
+                    ->label('Correo')
+                    ->searchable(),
+
                 TextColumn::make('document')
-                    ->searchable(),
-                TextColumn::make('specialty')
-                    ->searchable(),
-                TextColumn::make('professional_title')
-                    ->searchable(),
-                TextColumn::make('hire_date')
-                    ->date()
+                    ->label('Documento')
+                    ->searchable()
                     ->sortable(),
+
+                TextColumn::make('specialty')
+                    ->label('Especialidad')
+                    ->searchable(),
+
+                TextColumn::make('professional_title')
+                    ->label('Título profesional')
+                    ->searchable(),
+
+                TextColumn::make('hire_date')
+                    ->label('Fecha de vinculación')
+                    ->date('d/m/Y')
+                    ->sortable(),
+
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Creado')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Actualizado')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
