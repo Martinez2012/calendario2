@@ -14,13 +14,8 @@ class StudentsTable
     {
         return $table
             ->columns([
-                TextColumn::make('first_name')
-                    ->label('Nombres')
-                    ->searchable()
-                    ->sortable(),
-
-                TextColumn::make('last_name')
-                    ->label('Apellidos')
+                TextColumn::make('user.name')
+                    ->label('Nombre completo')
                     ->searchable()
                     ->sortable(),
 
@@ -47,8 +42,8 @@ class StudentsTable
                     ->label('Teléfono acudiente')
                     ->searchable(),
 
-                TextColumn::make('user.name')
-                    ->label('Usuario')
+                TextColumn::make('user.email')
+                    ->label('Correo')
                     ->searchable()
                     ->sortable(),
 

@@ -30,15 +30,17 @@ class StudentForm
                                 name: 'user',
                                 titleAttribute: 'name',
                                 modifyQueryUsing: function ($query, $livewire) {
-                                    $query->whereDoesntHave('student');
+                                    $query->where(function ($query) use ($livewire) {
+                                        $query->whereDoesntHave('student');
 
-                                    // Al editar, permitir mantener el usuario actual
-                                    if ($livewire->record) {
-                                        $query->orWhere(
-                                            'id',
-                                            $livewire->record->user_id
-                                        );
-                                    }
+                                        // Al editar, permitir mantener el usuario actual
+                                        if ($livewire->record) {
+                                            $query->orWhere(
+                                                'id',
+                                                $livewire->record->user_id
+                                            );
+                                        }
+                                    });
                                 }
                             )
                             ->getOptionLabelFromRecordUsing(
@@ -49,6 +51,7 @@ class StudentForm
                             ->preload()
                             ->required()
                             ->native(false)
+                            ->live()
                             ->prefixIcon('heroicon-o-user')
                             ->helperText(
                                 'Busca el usuario por nombre o correo electrónico.'
@@ -81,7 +84,12 @@ class StudentForm
                                         ->send();
 
                                     $set('user_id', null);
+
+                                    return;
                                 }
+
+                                // Enfocar automáticamente el campo Documento
+                                $livewire->dispatch('focus-student-document');
                             })
                             ->columnSpanFull(),
 
@@ -100,7 +108,11 @@ class StudentForm
                             ->unique(ignoreRecord: true)
                             ->maxLength(30)
                             ->prefixIcon('heroicon-o-identification')
-                            ->placeholder('Ej. 1234567890'),
+                            ->placeholder('Ej. 1234567890')
+                            ->extraAlpineAttributes([
+                                'x-on:focus-student-document.window' =>
+                                    '$nextTick(() => $el.focus())',
+                            ]),
 
                         DatePicker::make('birth_date')
                             ->label('Fecha de nacimiento')

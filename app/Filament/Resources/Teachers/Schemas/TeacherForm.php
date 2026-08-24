@@ -33,7 +33,20 @@ class TeacherForm
                             ->label('Usuario')
                             ->relationship(
                                 name: 'user',
-                                titleAttribute: 'name'
+                                titleAttribute: 'name',
+                                modifyQueryUsing: function ($query, $livewire) {
+                                    $query->where(function ($query) use ($livewire) {
+                                        $query->whereDoesntHave('teacher');
+
+                                        // Al editar, permitir mantener el usuario actual
+                                        if ($livewire->record) {
+                                            $query->orWhere(
+                                                'id',
+                                                $livewire->record->user_id
+                                            );
+                                        }
+                                    });
+                                }
                             )
                             ->getOptionLabelFromRecordUsing(
                                 fn (User $record): string =>
@@ -53,15 +66,6 @@ class TeacherForm
 
                                     // No hay usuario seleccionado
                                     if (!$state) {
-                                        $set('document', null);
-                                        return;
-                                    }
-
-                                    // Buscar usuario
-                                    $user = User::find($state);
-
-                                    if (!$user) {
-                                        $set('document', null);
                                         return;
                                     }
 
@@ -93,33 +97,12 @@ class TeacherForm
                                             ->send();
 
                                         $set('user_id', null);
-                                        $set('document', null);
 
                                         return;
                                     }
 
-                                    // =================================================
-                                    // CARGAR DOCUMENTO DEL USUARIO
-                                    // =================================================
-                                    if (!empty($user->document)) {
-
-                                        $set(
-                                            'document',
-                                            $user->document
-                                        );
-
-                                    } else {
-
-                                        $set('document', null);
-
-                                        Notification::make()
-                                            ->title('Usuario sin documento')
-                                            ->body(
-                                                'Este usuario no tiene un documento registrado en su cuenta.'
-                                            )
-                                            ->warning()
-                                            ->send();
-                                    }
+                                    // Enfocar automáticamente el campo Documento
+                                    $livewire->dispatch('focus-teacher-document');
                                 }
                             )
                             ->columnSpanFull(),
@@ -145,10 +128,10 @@ class TeacherForm
                             ->maxLength(30)
                             ->prefixIcon('heroicon-o-identification')
                             ->placeholder('Ej. 1234567890')
-                            ->helperText(
-                                'Se carga automáticamente desde la cuenta de usuario.'
-                            )
-                            ->readOnly(),
+                            ->extraAlpineAttributes([
+                                'x-on:focus-teacher-document.window' =>
+                                    '$nextTick(() => $el.focus())',
+                            ]),
 
                     ])
                     ->columns(1)

@@ -6,28 +6,27 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-
 #[Fillable([
     'name',
     'email',
-    'password'
+    'password',
 ])]
 
 #[Hidden([
     'password',
-    'remember_token'
+    'remember_token',
 ])]
 
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-     //use HasFactory, Notifiable, HasRoles;
-     use HasFactory, Notifiable;
-    
+    // use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable;
 
     protected function casts(): array
     {
@@ -37,20 +36,18 @@ class User extends Authenticatable
         ];
     }
 
-
     /**
      * Perfil docente
      */
-    public function teacher()
+    public function teacher(): HasOne
     {
         return $this->hasOne(Teacher::class);
     }
 
-
     /**
      * Perfil estudiante
      */
-    public function student()
+    public function student(): HasOne
     {
         return $this->hasOne(Student::class);
     }
