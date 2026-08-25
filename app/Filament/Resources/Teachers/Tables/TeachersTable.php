@@ -23,7 +23,7 @@ class TeachersTable
                     ->label('Correo')
                     ->searchable(),
 
-                TextColumn::make('document')
+                TextColumn::make('user.document')
                     ->label('Documento')
                     ->searchable()
                     ->sortable(),
@@ -33,11 +33,11 @@ class TeachersTable
                     ->searchable(),
 
                 TextColumn::make('professional_title')
-                    ->label('Título profesional')
+                    ->label('TÃ­tulo profesional')
                     ->searchable(),
 
                 TextColumn::make('hire_date')
-                    ->label('Fecha de vinculación')
+                    ->label('Fecha de vinculaciÃ³n')
                     ->date('d/m/Y')
                     ->sortable(),
 

@@ -36,7 +36,7 @@ class TeacherForm
                                 titleAttribute: 'name',
                                 modifyQueryUsing: function ($query, $livewire) {
                                     $query->where(function ($query) use ($livewire) {
-                                        $query->whereDoesntHave('teacher');
+                                        $query->whereDoesntHave('student');
 
                                         // Al editar, permitir mantener el usuario actual
                                         if ($livewire->record) {
@@ -50,22 +50,24 @@ class TeacherForm
                             )
                             ->getOptionLabelFromRecordUsing(
                                 fn (User $record): string =>
-                                    "{$record->name} - {$record->email}"
+                                    "{$record->name} - {$record->document}"
                             )
-                            ->searchable(['name', 'email'])
+                            ->searchable(['name', 'email', 'document'])
                             ->preload()
                             ->required()
                             ->native(false)
                             ->live()
                             ->prefixIcon('heroicon-o-user')
                             ->helperText(
-                                'Busca el usuario por nombre o correo electrónico.'
+                                'Busca el usuario por nombre, correo o documento.'
                             )
                             ->afterStateUpdated(
                                 function ($state, callable $set, $livewire) {
 
                                     // No hay usuario seleccionado
-                                    if (!$state) {
+                                    if (! $state) {
+                                        $set('document', null);
+
                                         return;
                                     }
 
@@ -97,12 +99,16 @@ class TeacherForm
                                             ->send();
 
                                         $set('user_id', null);
+                                        $set('document', null);
 
                                         return;
                                     }
 
-                                    // Enfocar automáticamente el campo Documento
-                                    $livewire->dispatch('focus-teacher-document');
+                                    // Autocompleta el documento a partir del usuario seleccionado
+                                    $set('document', User::find($state)?->document);
+
+                                    // Enfocar automáticamente el siguiente campo relevante
+                                    $livewire->dispatch('focus-teacher-specialty');
                                 }
                             )
                             ->columnSpanFull(),
@@ -124,10 +130,69 @@ class TeacherForm
                         TextInput::make('document')
                             ->label('Documento de identidad')
                             ->required()
-                            ->unique(ignoreRecord: true)
                             ->maxLength(30)
                             ->prefixIcon('heroicon-o-identification')
                             ->placeholder('Ej. 1234567890')
+                            ->helperText(
+                                'Escribe el documento para buscar al usuario, o selecciónalo arriba.'
+                            )
+                            ->live(onBlur: true)
+                            ->dehydrated(false) // el documento vive en users, no en teachers
+                            ->afterStateUpdated(function ($state, callable $set, callable $get, $livewire) {
+
+                                if (blank($state)) {
+                                    return;
+                                }
+
+                                $user = User::where('document', $state)->first();
+
+                                if (! $user) {
+                                    Notification::make()
+                                        ->title('Documento no encontrado')
+                                        ->body('No existe ningún usuario con ese documento.')
+                                        ->warning()
+                                        ->send();
+
+                                    return;
+                                }
+
+                                if ($user->id === $get('user_id')) {
+                                    // Ya es el usuario seleccionado, nada que hacer
+                                    return;
+                                }
+
+                                if ($user->student) {
+                                    Notification::make()
+                                        ->title('Usuario no válido')
+                                        ->body('Este usuario ya está registrado como estudiante.')
+                                        ->danger()
+                                        ->send();
+
+                                    $set('document', null);
+
+                                    return;
+                                }
+
+                                $query = Teacher::where('user_id', $user->id);
+
+                                if ($livewire->record) {
+                                    $query->where('id', '!=', $livewire->record->id);
+                                }
+
+                                if ($query->exists()) {
+                                    Notification::make()
+                                        ->title('Usuario ya registrado')
+                                        ->body('Este usuario ya está registrado como docente.')
+                                        ->danger()
+                                        ->send();
+
+                                    $set('document', null);
+
+                                    return;
+                                }
+
+                                $set('user_id', $user->id);
+                            })
                             ->extraAlpineAttributes([
                                 'x-on:focus-teacher-document.window' =>
                                     '$nextTick(() => $el.focus())',
@@ -156,7 +221,11 @@ class TeacherForm
                             )
                             ->helperText(
                                 'Área o especialidad principal del docente.'
-                            ),
+                            )
+                            ->extraAlpineAttributes([
+                                'x-on:focus-teacher-specialty.window' =>
+                                    '$nextTick(() => $el.focus())',
+                            ]),
 
                         TextInput::make('professional_title')
                             ->label('Título profesional')

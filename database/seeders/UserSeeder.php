@@ -14,6 +14,7 @@ class UserSeeder extends Seeder
         User::create([
             'name' => 'Administrador',
             'email' => 'admin@escuela.com',
+            'document' => fake()->unique()->numerify('123456789'),
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
         ]);

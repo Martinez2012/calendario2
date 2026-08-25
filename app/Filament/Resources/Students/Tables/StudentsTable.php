@@ -24,7 +24,7 @@ class StudentsTable
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('document')
+                TextColumn::make('user.document')
                     ->label('Documento')
                     ->searchable()
                     ->sortable(),

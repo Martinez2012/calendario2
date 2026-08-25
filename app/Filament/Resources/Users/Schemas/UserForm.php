@@ -18,6 +18,12 @@ class UserForm
                     ->label('Email address')
                     ->email()
                     ->required(),
+                TextInput::make('document')
+                    ->label('Documento de identidad')
+                    ->required()
+                    ->unique(ignoreRecord: true)
+                    ->maxLength(30)
+                    ->placeholder('Ej. 1234567890'),
                 DateTimePicker::make('email_verified_at'),
                 TextInput::make('password')
                     ->password()

@@ -19,8 +19,6 @@ return new class extends Migration
                 ->constrained()
                 ->cascadeOnDelete();
 
-            $table->string('document')->unique();
-
             $table->string('specialty')
                 ->nullable();
 

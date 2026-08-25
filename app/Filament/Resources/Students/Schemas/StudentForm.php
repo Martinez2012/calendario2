@@ -31,7 +31,7 @@ class StudentForm
                                 titleAttribute: 'name',
                                 modifyQueryUsing: function ($query, $livewire) {
                                     $query->where(function ($query) use ($livewire) {
-                                        $query->whereDoesntHave('student');
+                                        $query->whereDoesntHave('teacher');
 
                                         // Al editar, permitir mantener el usuario actual
                                         if ($livewire->record) {
@@ -45,20 +45,22 @@ class StudentForm
                             )
                             ->getOptionLabelFromRecordUsing(
                                 fn (User $record): string =>
-                                    "{$record->name} - {$record->email}"
+                                    "{$record->name} - {$record->document}"
                             )
-                            ->searchable(['name', 'email'])
+                            ->searchable(['name', 'email', 'document'])
                             ->preload()
                             ->required()
                             ->native(false)
                             ->live()
                             ->prefixIcon('heroicon-o-user')
                             ->helperText(
-                                'Busca el usuario por nombre o correo electrónico.'
+                                'Busca el usuario por nombre, correo o documento.'
                             )
                             ->afterStateUpdated(function ($state, callable $set, $livewire) {
 
-                                if (!$state) {
+                                if (! $state) {
+                                    $set('document', null);
+
                                     return;
                                 }
 
@@ -84,12 +86,16 @@ class StudentForm
                                         ->send();
 
                                     $set('user_id', null);
+                                    $set('document', null);
 
                                     return;
                                 }
 
-                                // Enfocar automáticamente el campo Documento
-                                $livewire->dispatch('focus-student-document');
+                                // Autocompleta el documento a partir del usuario seleccionado
+                                $set('document', User::find($state)?->document);
+
+                                // Enfocar automáticamente el siguiente campo relevante
+                                $livewire->dispatch('focus-student-code');
                             })
                             ->columnSpanFull(),
 
@@ -105,10 +111,69 @@ class StudentForm
                         TextInput::make('document')
                             ->label('Documento')
                             ->required()
-                            ->unique(ignoreRecord: true)
                             ->maxLength(30)
                             ->prefixIcon('heroicon-o-identification')
                             ->placeholder('Ej. 1234567890')
+                            ->helperText(
+                                'Escribe el documento para buscar al usuario, o selecciónalo arriba.'
+                            )
+                            ->live(onBlur: true)
+                            ->dehydrated(false) // el documento vive en users, no en students
+                            ->afterStateUpdated(function ($state, callable $set, callable $get, $livewire) {
+
+                                if (blank($state)) {
+                                    return;
+                                }
+
+                                $user = User::where('document', $state)->first();
+
+                                if (! $user) {
+                                    Notification::make()
+                                        ->title('Documento no encontrado')
+                                        ->body('No existe ningún usuario con ese documento.')
+                                        ->warning()
+                                        ->send();
+
+                                    return;
+                                }
+
+                                if ($user->id === $get('user_id')) {
+                                    // Ya es el usuario seleccionado, nada que hacer
+                                    return;
+                                }
+
+                                if ($user->teacher) {
+                                    Notification::make()
+                                        ->title('Usuario no válido')
+                                        ->body('Este usuario ya está registrado como profesor.')
+                                        ->danger()
+                                        ->send();
+
+                                    $set('document', null);
+
+                                    return;
+                                }
+
+                                $query = Student::where('user_id', $user->id);
+
+                                if ($livewire->record) {
+                                    $query->where('id', '!=', $livewire->record->id);
+                                }
+
+                                if ($query->exists()) {
+                                    Notification::make()
+                                        ->title('Usuario ya registrado')
+                                        ->body('Este usuario ya está registrado como estudiante.')
+                                        ->danger()
+                                        ->send();
+
+                                    $set('document', null);
+
+                                    return;
+                                }
+
+                                $set('user_id', $user->id);
+                            })
                             ->extraAlpineAttributes([
                                 'x-on:focus-student-document.window' =>
                                     '$nextTick(() => $el.focus())',
@@ -138,7 +203,11 @@ class StudentForm
                             ->unique(ignoreRecord: true)
                             ->maxLength(50)
                             ->prefixIcon('heroicon-o-identification')
-                            ->placeholder('Ej. EST-001'),
+                            ->placeholder('Ej. EST-001')
+                            ->extraAlpineAttributes([
+                                'x-on:focus-student-code.window' =>
+                                    '$nextTick(() => $el.focus())',
+                            ]),
 
                     ])
                     ->columns(1)

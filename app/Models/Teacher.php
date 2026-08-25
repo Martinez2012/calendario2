@@ -8,7 +8,6 @@ class Teacher extends Model
 {
     protected $fillable = [
         'user_id',
-        'document',
         'specialty',
         'professional_title',
         'hire_date',

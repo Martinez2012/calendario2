@@ -21,8 +21,6 @@ return new class extends Migration
 
             $table->string('student_code')->unique();
 
-            $table->string('document')->unique();
-
             $table->date('birth_date')->nullable();
 
             $table->string('guardian_name')->nullable();

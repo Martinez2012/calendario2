@@ -14,6 +14,7 @@ use Spatie\Permission\Traits\HasRoles;
 #[Fillable([
     'name',
     'email',
+    'document',
     'password',
 ])]
 
