@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Tasks\Tables;
 
+use App\Models\Task;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -14,23 +15,45 @@ class TasksTable
     {
         return $table
             ->columns([
-                TextColumn::make('teacher_subject_group_id')
-                    ->numeric()
+                TextColumn::make('teacherSubjectGroup.teacher.user.name')
+                    ->label('Profesor')
+                    ->searchable()
                     ->sortable(),
+
+                TextColumn::make('teacherSubjectGroup.subject.name')
+                    ->label('Materia')
+                    ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('teacherSubjectGroup.group.name')
+                    ->label('Grupo')
+                    ->searchable()
+                    ->sortable(),
+
                 TextColumn::make('title')
-                    ->searchable(),
+                    ->label('Título')
+                    ->searchable()
+                    ->sortable(),
+
                 TextColumn::make('assigned_at')
-                    ->dateTime()
+                    ->label('Asignada')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable(),
+
                 TextColumn::make('due_at')
-                    ->dateTime()
+                    ->label('Entrega')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable(),
+
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Creado')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Actualizado')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

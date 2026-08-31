@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\Groups\Schemas;
 
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use Illuminate\Validation\Rules\Unique;
 
 class GroupForm
 {
@@ -11,11 +13,31 @@ class GroupForm
     {
         return $schema
             ->components([
-                TextInput::make('grade_id')
+
+                Select::make('grade_id')
+                    ->label('Grado')
+                    ->relationship(name: 'grade', titleAttribute: 'name')
+                    ->searchable()
+                    ->preload()
                     ->required()
-                    ->numeric(),
+                    ->native(false)
+                    ->live()
+                    ->prefixIcon('heroicon-o-academic-cap'),
+
                 TextInput::make('name')
-                    ->required(),
+                    ->label('Nombre del grupo')
+                    ->required()
+                    ->maxLength(20)
+                    ->placeholder('Ej. 1er Grado A')
+                    ->unique(
+                        ignoreRecord: true,
+                        modifyRuleUsing: fn (Unique $rule, callable $get) =>
+                            $rule->where('grade_id', $get('grade_id')),
+                    )
+                    ->validationMessages([
+                        'unique' => 'Ya existe un grupo con este nombre en el grado seleccionado.',
+                    ]),
+
             ]);
     }
 }

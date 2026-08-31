@@ -138,6 +138,9 @@ class TeacherForm
                             )
                             ->live(onBlur: true)
                             ->dehydrated(false) // el documento vive en users, no en teachers
+                            ->afterStateHydrated(function ($component, $record) {
+                                $component->state($record?->user?->document);
+                            })
                             ->afterStateUpdated(function ($state, callable $set, callable $get, $livewire) {
 
                                 if (blank($state)) {

@@ -6,6 +6,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class EventsTable
@@ -15,32 +16,71 @@ class EventsTable
         return $table
             ->columns([
                 TextColumn::make('title')
-                    ->searchable(),
+                    ->label('Título')
+                    ->searchable()
+                    ->sortable(),
+
                 TextColumn::make('type')
-                    ->searchable(),
+                    ->label('Tipo')
+                    ->badge()
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'holiday' => 'Feriado',
+                        'exam' => 'Examen',
+                        'meeting' => 'Reunión',
+                        'activity' => 'Actividad',
+                        default => $state,
+                    })
+                    ->color(fn (string $state): string => match ($state) {
+                        'holiday' => 'gray',
+                        'exam' => 'danger',
+                        'meeting' => 'info',
+                        'activity' => 'success',
+                        default => 'gray',
+                    })
+                    ->sortable(),
+
+                TextColumn::make('group.name')
+                    ->label('Grupo')
+                    ->placeholder('General')
+                    ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('teacherSubjectGroup.subject.name')
+                    ->label('Materia (examen)')
+                    ->placeholder('—')
+                    ->toggleable(),
+
                 TextColumn::make('start')
-                    ->dateTime()
+                    ->label('Inicio')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable(),
+
                 TextColumn::make('end')
-                    ->dateTime()
+                    ->label('Fin')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable(),
-                TextColumn::make('group_id')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('teacher_subject_group_id')
-                    ->numeric()
-                    ->sortable(),
+
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Creado')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Actualizado')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('type')
+                    ->label('Tipo')
+                    ->options([
+                        'holiday' => 'Feriado',
+                        'exam' => 'Examen',
+                        'meeting' => 'Reunión',
+                        'activity' => 'Actividad',
+                    ]),
             ])
             ->recordActions([
                 EditAction::make(),

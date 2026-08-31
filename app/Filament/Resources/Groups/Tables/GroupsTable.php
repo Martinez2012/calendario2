@@ -14,17 +14,25 @@ class GroupsTable
     {
         return $table
             ->columns([
-                TextColumn::make('grade_id')
-                    ->numeric()
+                TextColumn::make('grade.name')
+                    ->label('Grado')
+                    ->searchable()
                     ->sortable(),
+
                 TextColumn::make('name')
-                    ->searchable(),
+                    ->label('Grupo')
+                    ->searchable()
+                    ->sortable(),
+
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Creado')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Actualizado')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

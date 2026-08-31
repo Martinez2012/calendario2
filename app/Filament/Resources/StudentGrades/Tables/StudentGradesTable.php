@@ -14,21 +14,44 @@ class StudentGradesTable
     {
         return $table
             ->columns([
-                TextColumn::make('student_id')
-                    ->numeric()
+                TextColumn::make('student.user.name')
+                    ->label('Estudiante')
+                    ->searchable()
                     ->sortable(),
-                TextColumn::make('task_submission_id')
-                    ->numeric()
-                    ->sortable(),
+
+                TextColumn::make('taskSubmission.task.title')
+                    ->label('Tarea')
+                    ->placeholder('Sin entrega asociada')
+                    ->searchable()
+                    ->toggleable(),
+
                 TextColumn::make('score')
-                    ->numeric()
+                    ->label('Nota')
+                    ->numeric(decimalPlaces: 2)
+                    ->badge()
+                    ->color(fn (float $state): string => match (true) {
+                        $state >= 90 => 'success',
+                        $state >= 70 => 'info',
+                        $state >= 60 => 'warning',
+                        default => 'danger',
+                    })
                     ->sortable(),
+
+                TextColumn::make('observations')
+                    ->label('Observaciones')
+                    ->limit(40)
+                    ->placeholder('—')
+                    ->toggleable(),
+
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Creado')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Actualizado')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

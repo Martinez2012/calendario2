@@ -14,21 +14,30 @@ class TeacherSubjectGroupsTable
     {
         return $table
             ->columns([
-                TextColumn::make('teacher_id')
-                    ->numeric()
+                TextColumn::make('teacher.user.name')
+                    ->label('Profesor')
+                    ->searchable()
                     ->sortable(),
-                TextColumn::make('subject_id')
-                    ->numeric()
+
+                TextColumn::make('subject.name')
+                    ->label('Materia')
+                    ->searchable()
                     ->sortable(),
-                TextColumn::make('group_id')
-                    ->numeric()
+
+                TextColumn::make('group.name')
+                    ->label('Grupo')
+                    ->searchable()
                     ->sortable(),
+
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Creado')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Actualizado')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
