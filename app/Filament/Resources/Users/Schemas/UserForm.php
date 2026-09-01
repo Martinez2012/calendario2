@@ -3,8 +3,10 @@
 namespace App\Filament\Resources\Users\Schemas;
 
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\Hash;
 
 class UserForm
 {
@@ -13,21 +15,42 @@ class UserForm
         return $schema
             ->components([
                 TextInput::make('name')
-                    ->required(),
+                    ->label('Nombre')
+                    ->required()
+                    ->maxLength(255),
+
                 TextInput::make('email')
-                    ->label('Email address')
+                    ->label('Email')
                     ->email()
-                    ->required(),
+                    ->required()
+                    ->unique(ignoreRecord: true)
+                    ->maxLength(255),
+
                 TextInput::make('document')
                     ->label('Documento de identidad')
                     ->required()
                     ->unique(ignoreRecord: true)
                     ->maxLength(30)
                     ->placeholder('Ej. 1234567890'),
-                DateTimePicker::make('email_verified_at'),
-                TextInput::make('password')
-                    ->password()
+
+                Select::make('roles')
+                    ->label('Rol')
+                    ->relationship('roles', 'name')
+                    ->multiple()
+                    ->preload()
+                    ->searchable()
                     ->required(),
+
+                DateTimePicker::make('email_verified_at')
+                    ->label('Email verificado'),
+
+                TextInput::make('password')
+                    ->label('Contraseña')
+                    ->password()
+                    ->revealable()
+                    ->required(fn (string $operation): bool => $operation === 'create')
+                    ->dehydrated(fn (?string $state): bool => filled($state))
+                    ->dehydrateStateUsing(fn (string $state): string => Hash::make($state)),
             ]);
     }
 }
