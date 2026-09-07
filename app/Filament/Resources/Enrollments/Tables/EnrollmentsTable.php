@@ -24,11 +24,11 @@ class EnrollmentsTable
                     ->label('Código')
                     ->searchable()
                     ->toggleable(),
-
+                
                 TextColumn::make('group.name')
-                    ->label('Grupo')
-                    ->searchable()
-                    ->sortable(),
+                    ->label('Grupo (' . now()->year . ')')
+                    ->badge()
+                    ->color(fn (string $state): string => $state === 'Sin asignar' ? 'danger' : 'success'),
 
                 TextColumn::make('school_year')
                     ->label('Año escolar')

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Students\Schemas;
 
+use App\Models\Group;
 use App\Models\Student;
 use App\Models\User;
 use Filament\Forms\Components\DatePicker;
@@ -95,7 +96,7 @@ class StudentForm
                                 $set('document', User::find($state)?->document);
 
                                 // Enfocar automáticamente el siguiente campo relevante
-                                $livewire->dispatch('focus-student-code');
+                                $livewire->dispatch('focus-student-birthdate');
                             })
                             ->columnSpanFull(),
 
@@ -186,7 +187,11 @@ class StudentForm
                             ->label('Fecha de nacimiento')
                             ->native(false)
                             ->displayFormat('d/m/Y')
-                            ->prefixIcon('heroicon-o-calendar-days'),
+                            ->prefixIcon('heroicon-o-calendar-days')
+                            ->extraAlpineAttributes([
+                                'x-on:focus-student-birthdate.window' =>
+                                    '$nextTick(() => $el.focus())',
+                            ]),
 
                     ])
                     ->columns([
@@ -202,15 +207,31 @@ class StudentForm
 
                         TextInput::make('student_code')
                             ->label('Código estudiantil')
-                            ->required()
-                            ->unique(ignoreRecord: true)
                             ->maxLength(50)
                             ->prefixIcon('heroicon-o-identification')
-                            ->placeholder('Ej. EST-001')
-                            ->extraAlpineAttributes([
-                                'x-on:focus-student-code.window' =>
-                                    '$nextTick(() => $el.focus())',
-                            ]),
+                            ->disabled()
+                            ->placeholder('Se asignará automáticamente al guardar')
+                            ->helperText('Este código se genera automáticamente y no se puede modificar.'),
+
+                        Select::make('group_id')
+                            ->label('Grupo (' . now()->year . ')')
+                            ->options(fn () => Group::with('grade')->get()->mapWithKeys(
+                                fn (Group $group) => [$group->id => $group->name]
+                            ))
+                            ->searchable()
+                            ->preload()
+                            ->required()
+                            ->native(false)
+                            ->prefixIcon('heroicon-o-user-group')
+                            ->helperText('Matrícula del estudiante para el año escolar actual.')
+                            ->afterStateHydrated(function ($component, $record) {
+                                $component->state(
+                                    $record?->enrollments()
+                                        ->where('school_year', now()->year)
+                                        ->first()
+                                        ?->group_id
+                                );
+                            }),
 
                     ])
                     ->columns(1)

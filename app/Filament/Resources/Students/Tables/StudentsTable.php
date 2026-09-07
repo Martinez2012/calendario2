@@ -24,6 +24,18 @@ class StudentsTable
                     ->searchable()
                     ->sortable(),
 
+                TextColumn::make('current_group')
+                    ->label('Grupo (' . now()->year . ')')
+                    ->getStateUsing(
+                        fn ($record) => $record->enrollments()
+                            ->where('school_year', now()->year)
+                            ->first()
+                            ?->group
+                            ?->name ?? 'Sin asignar'
+                    )
+                    ->badge()
+                    ->color(fn (string $state): string => $state === 'Sin asignar' ? 'danger' : 'success'),
+
                 TextColumn::make('user.document')
                     ->label('Documento')
                     ->searchable()

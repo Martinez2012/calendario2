@@ -21,10 +21,12 @@ class TaskSubmissionsTable
                     ->sortable(),
 
                 TextColumn::make('task.teacherSubjectGroup.group.name')
-                    ->label('Grupo')
+                    ->label('Grupo (' . now()->year . ')')
                     ->searchable()
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable()
+                    ->badge()
+                    ->color(fn (string $state): string => $state === 'Sin asignar' ? 'danger' : 'success'),
 
                 TextColumn::make('student.user.name')
                     ->label('Estudiante')

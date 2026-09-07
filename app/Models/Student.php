@@ -2,20 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Student extends Model
 {
-    use HasFactory;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'user_id',
         'student_code',
@@ -24,46 +14,47 @@ class Student extends Model
         'guardian_phone',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    protected static function booted(): void
     {
-        return [
-            'birth_date' => 'date',
-        ];
+        static::creating(function (Student $student) {
+            if (blank($student->student_code)) {
+                $student->student_code = self::generateNextCode();
+            }
+        });
     }
 
     /**
-     * Get the user account associated with the student.
+     * Genera el siguiente código disponible (EST-0001, EST-0002, ...)
+     * basándose en el número más alto ya usado, no en el conteo total,
+     * para no reutilizar códigos si se elimina un estudiante intermedio.
      */
-    public function user(): BelongsTo
+    protected static function generateNextCode(): string
+    {
+        $lastNumber = static::query()
+            ->selectRaw("MAX(CAST(SUBSTRING(student_code, 5) AS UNSIGNED)) as max_number")
+            ->value('max_number');
+
+        $nextNumber = ($lastNumber ?? 0) + 1;
+
+        return 'EST-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+    }
+
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Get the enrollments for the student.
-     */
-    public function enrollments(): HasMany
+    public function enrollments()
     {
         return $this->hasMany(Enrollment::class);
     }
 
-    /**
-     * Get the task submissions for the student.
-     */
-    public function taskSubmissions(): HasMany
+    public function taskSubmissions()
     {
         return $this->hasMany(TaskSubmission::class);
     }
 
-    /**
-     * Get the grades for the student.
-     */
-    public function grades(): HasMany
+    public function grades()
     {
         return $this->hasMany(StudentGrade::class);
     }

@@ -20,9 +20,11 @@ class GroupsTable
                     ->sortable(),
 
                 TextColumn::make('name')
-                    ->label('Grupo')
-                    ->searchable()
-                    ->sortable(),
+                    ->label('Grupo (' . now()->year . ')')
+                    ->searchable()                    
+                    ->badge()
+                    ->sortable()
+                    ->color(fn (string $state): string => $state === 'Sin asignar' ? 'danger' : 'success'),
 
                 TextColumn::make('created_at')
                     ->label('Creado')

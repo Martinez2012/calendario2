@@ -115,9 +115,11 @@ class TasksTable
                     ->sortable(),
 
                 TextColumn::make('teacherSubjectGroup.group.name')
-                    ->label('Grupo')
+                    ->label('Grupo (' . now()->year . ')')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->badge()
+                    ->color(fn (string $state): string => $state === 'Sin asignar' ? 'danger' : 'success'),
 
                 TextColumn::make('title')
                     ->label('Título')
@@ -160,4 +162,3 @@ class TasksTable
             ]);
     }
 }
-Ñ
