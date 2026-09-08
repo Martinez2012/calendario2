@@ -16,4 +16,12 @@ class EditStudent extends EditRecord
             DeleteAction::make(),
         ];
     }
+
+    protected function afterSave(): void
+    {
+        $this->record->enrollments()->updateOrCreate(
+            ['school_year' => now()->year],
+            ['group_id' => $this->data['group_id']]
+        );
+    }
 }

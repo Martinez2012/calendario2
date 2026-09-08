@@ -224,6 +224,7 @@ class StudentForm
                             ->native(false)
                             ->prefixIcon('heroicon-o-user-group')
                             ->helperText('Matrícula del estudiante para el año escolar actual.')
+                            ->dehydrated(false)
                             ->afterStateHydrated(function ($component, $record) {
                                 $component->state(
                                     $record?->enrollments()

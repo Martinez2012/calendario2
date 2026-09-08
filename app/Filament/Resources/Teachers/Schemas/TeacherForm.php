@@ -132,7 +132,7 @@ class TeacherForm
                             ->required()
                             ->maxLength(30)
                             ->prefixIcon('heroicon-o-identification')
-                            ->placeholder('Ej. 1234567890')
+                            ->placeaholder('Ej. 1234567890')
                             ->helperText(
                                 'Escribe el documento para buscar al usuario, o selecciónalo arriba.'
                             )

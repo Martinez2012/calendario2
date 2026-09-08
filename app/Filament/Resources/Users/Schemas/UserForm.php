@@ -39,7 +39,7 @@ class UserForm
                     ->multiple()
                     ->preload()
                     ->searchable()
-                    ->required(),
+                    ->helperText('Déjalo vacío si este usuario será registrado como estudiante o profesor: el rol se asignará automáticamente.'),
 
                 DateTimePicker::make('email_verified_at')
                     ->label('Email verificado'),

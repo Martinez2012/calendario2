@@ -8,4 +8,9 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateTeacher extends CreateRecord
 {
     protected static string $resource = TeacherResource::class;
+
+    protected function afterCreate(): void
+    {
+        $this->record->user->syncRoles(['profesor']);
+    }
 }
