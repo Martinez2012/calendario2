@@ -15,10 +15,11 @@ class UsersTable
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->label('Nombre')
                     ->searchable(),
 
                 TextColumn::make('email')
-                    ->label('Email address')
+                    ->label('Correo Electronico')
                     ->searchable(),
 
                 TextColumn::make('roles.name')
@@ -28,16 +29,19 @@ class UsersTable
                     ->searchable(),
 
                 TextColumn::make('email_verified_at')
-                    ->dateTime()
+                    ->label('Verificado en')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable(),
 
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Creado')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Actualizado')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

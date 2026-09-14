@@ -33,11 +33,11 @@ class TeachersTable
                     ->searchable(),
 
                 TextColumn::make('professional_title')
-                    ->label('TÃ­tulo profesional')
+                    ->label('Titulo profesional')
                     ->searchable(),
 
                 TextColumn::make('hire_date')
-                    ->label('Fecha de vinculaciÃ³n')
+                    ->label('Fecha de vinculacion')
                     ->date('d/m/Y')
                     ->sortable(),
 
