@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use App\Observers\StudentObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 
+#[ObservedBy(StudentObserver::class)]
 class Student extends Model
 {
     protected $fillable = [
@@ -23,11 +26,6 @@ class Student extends Model
         });
     }
 
-    /**
-     * Genera el siguiente código disponible (EST-0001, EST-0002, ...)
-     * basándose en el número más alto ya usado, no en el conteo total,
-     * para no reutilizar códigos si se elimina un estudiante intermedio.
-     */
     protected static function generateNextCode(): string
     {
         $lastNumber = static::query()
