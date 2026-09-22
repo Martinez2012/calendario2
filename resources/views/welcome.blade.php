@@ -1,1603 +1,607 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-
 <head>
-
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Plataforma de gestión académica ClassHub">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1"
-    >
+    {{-- FAVICON --}}
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('favicon-192x192.png') }}">
 
-    <meta
-        name="description"
-        content="Plataforma de gestión académica"
-    >
+    <title>{{ config('app.name', 'ClassHub') }}</title>
 
-    <title>
-        {{ config('app.name', 'Filament Academy') }}
-    </title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    {{-- ==========================================================
-         TAILWIND
-         No utiliza Vite ni public/build/manifest.json
-    =========================================================== --}}
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <script>
+    <style>
+        * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
 
-        tailwind.config = {
-
-            theme: {
-
-                extend: {
-
-                    colors: {
-
-                        academy: {
-                            50: '#fffbea',
-                            100: '#fff3b0',
-                            200: '#ffe66b',
-                            300: '#ffd633',
-                            400: '#facc15',
-                            500: '#eab308',
-                            600: '#ca8a04',
-                            700: '#a16207',
-                            800: '#854d0e',
-                            900: '#713f12',
-                        }
-
-                    },
-
-                    boxShadow: {
-
-                        academy:
-                            '0 20px 70px rgba(250, 204, 21, 0.08)',
-
-                    }
-
-                }
-
-            }
-
+        :root {
+            --yellow: #facc15;
+            --yellow-dark: #eab308;
+            --bg: #09090b;
+            --bg2: #0f0f11;
+            --surface: #141416;
+            --border: rgba(255,255,255,0.07);
         }
 
-    </script>
+        html { scroll-behavior: smooth; }
 
+        body { background: var(--bg); color: #fff; margin: 0; overflow-x: hidden; }
+
+        /* ANIMACIÓN ENTRADA */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50%       { transform: translateY(-8px); }
+        }
+        @keyframes pulse-ring {
+            0%   { transform: scale(1);   opacity: 0.4; }
+            100% { transform: scale(1.6); opacity: 0; }
+        }
+        @keyframes counter {
+            from { opacity: 0; transform: scale(0.8); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+        @keyframes shimmer {
+            0%   { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+
+        .anim-fadeup  { animation: fadeUp 0.7s ease both; }
+        .anim-fadein  { animation: fadeIn 0.6s ease both; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.35s; }
+        .delay-4 { animation-delay: 0.5s; }
+        .delay-5 { animation-delay: 0.65s; }
+
+        /* NAVBAR */
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            border-bottom: 1px solid var(--border);
+            background: rgba(9,9,11,0.85);
+            backdrop-filter: blur(20px);
+        }
+        .navbar-inner {
+            max-width: 1200px; margin: 0 auto;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 2rem; height: 72px;
+        }
+        .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .brand-icon {
+            width: 40px; height: 40px; border-radius: 10px;
+            background: var(--yellow); display: flex; align-items: center; justify-content: center;
+            animation: float 3s ease-in-out infinite;
+        }
+        .brand-icon img { width: 28px; height: 28px; object-fit: contain; }
+        .brand-name { font-weight: 800; font-size: 1.1rem; color: #fff; }
+        .brand-sub  { font-size: 0.65rem; font-weight: 600; color: var(--yellow); letter-spacing: 0.05em; }
+
+        nav a {
+            font-size: 0.875rem; color: #a1a1aa;
+            text-decoration: none; transition: color 0.2s;
+        }
+        nav a:hover { color: #fff; }
+
+        .btn-primary {
+            background: var(--yellow); color: #000;
+            font-weight: 700; font-size: 0.875rem;
+            padding: 0.6rem 1.25rem; border-radius: 8px;
+            text-decoration: none; border: none; cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-primary:hover { background: #fde047; transform: translateY(-1px); }
+
+        .btn-ghost {
+            background: transparent; color: #d4d4d8;
+            font-weight: 500; font-size: 0.875rem;
+            padding: 0.6rem 1.25rem; border-radius: 8px;
+            text-decoration: none; border: 1px solid var(--border);
+            transition: border-color 0.2s, color 0.2s, background 0.2s;
+            display: inline-flex; align-items: center;
+        }
+        .btn-ghost:hover { border-color: rgba(250,204,21,0.3); color: var(--yellow); background: rgba(250,204,21,0.04); }
+
+        /* HERO */
+        .hero {
+            min-height: 100vh;
+            display: flex; align-items: center;
+            padding: 120px 2rem 80px;
+            position: relative; overflow: hidden;
+        }
+        .hero-glow {
+            position: absolute; top: -100px; left: 50%; transform: translateX(-50%);
+            width: 900px; height: 600px; border-radius: 50%;
+            background: radial-gradient(ellipse, rgba(250,204,21,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero-grid {
+            max-width: 1200px; margin: 0 auto; width: 100%;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+        }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(250,204,21,0.08); border: 1px solid rgba(250,204,21,0.2);
+            border-radius: 100px; padding: 6px 14px;
+            font-size: 0.75rem; font-weight: 600; color: var(--yellow);
+            margin-bottom: 1.5rem;
+        }
+        .badge-dot {
+            width: 6px; height: 6px; border-radius: 50%; background: var(--yellow);
+            position: relative;
+        }
+        .badge-dot::after {
+            content: ''; position: absolute; inset: -3px;
+            border-radius: 50%; border: 2px solid var(--yellow);
+            animation: pulse-ring 1.5s ease-out infinite;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 900; line-height: 1.05;
+            letter-spacing: -0.03em; margin: 0 0 1.25rem;
+            color: #fff;
+        }
+        .hero h1 em {
+            font-style: normal;
+            background: linear-gradient(135deg, var(--yellow) 0%, #fb923c 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero p {
+            font-size: 1.1rem; line-height: 1.75;
+            color: #71717a; max-width: 480px; margin: 0 0 2rem;
+        }
+        .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; }
+
+        /* STATS STRIP */
+        .stats-strip {
+            margin-top: 3rem; padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            display: flex; gap: 2.5rem;
+        }
+        .stat-item {}
+        .stat-num {
+            font-size: 1.75rem; font-weight: 900;
+            color: #fff; line-height: 1;
+            animation: counter 0.5s ease both;
+        }
+        .stat-num span { color: var(--yellow); }
+        .stat-label { font-size: 0.75rem; color: #52525b; margin-top: 4px; }
+
+        /* PANEL MOCKUP */
+        .mockup {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px; overflow: hidden;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04);
+            animation: float 4s ease-in-out infinite;
+        }
+        .mockup-bar {
+            background: #0d0d0f; border-bottom: 1px solid var(--border);
+            padding: 12px 16px; display: flex; align-items: center; gap: 8px;
+        }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .dot-r { background: #ef4444; }
+        .dot-y { background: var(--yellow); }
+        .dot-g { background: #22c55e; }
+        .mockup-url {
+            flex: 1; margin-left: 12px; background: rgba(255,255,255,0.04);
+            border-radius: 6px; height: 24px;
+        }
+        .mockup-body { display: flex; min-height: 340px; }
+        .mockup-sidebar {
+            width: 160px; background: #0a0a0c;
+            border-right: 1px solid var(--border); padding: 16px 12px;
+            flex-shrink: 0;
+        }
+        .sidebar-brand {
+            display: flex; align-items: center; gap: 8px; margin-bottom: 20px; padding: 0 4px;
+        }
+        .sidebar-logo {
+            width: 22px; height: 22px; border-radius: 5px;
+            background: var(--yellow); display: flex; align-items: center; justify-content: center;
+            font-size: 10px;
+        }
+        .sidebar-name { font-size: 9px; font-weight: 800; color: #fff; }
+        .sidebar-item {
+            display: flex; align-items: center; gap: 6px;
+            padding: 6px 8px; border-radius: 6px;
+            font-size: 8px; color: #52525b; margin-bottom: 2px;
+        }
+        .sidebar-item.active { background: rgba(250,204,21,0.1); color: var(--yellow); }
+        .sidebar-dot { width: 3px; height: 3px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+
+        .mockup-content { flex: 1; padding: 20px; }
+        .mc-header { margin-bottom: 16px; }
+        .mc-label { font-size: 8px; color: #3f3f46; }
+        .mc-title { font-size: 14px; font-weight: 700; color: #fff; margin-top: 2px; }
+
+        .mc-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+        .mc-card {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+            border-radius: 8px; padding: 10px;
+        }
+        .mc-card.accent { border-color: rgba(250,204,21,0.15); background: rgba(250,204,21,0.03); }
+        .mc-card-label { font-size: 7px; color: #52525b; }
+        .mc-card-val { font-size: 16px; font-weight: 800; color: #fff; margin: 4px 0 2px; }
+        .mc-card.accent .mc-card-val { color: var(--yellow); }
+        .mc-card-change { font-size: 6px; color: #22c55e; }
+
+        .mc-chart { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
+        .mc-chart-label { font-size: 7px; color: #52525b; margin-bottom: 10px; }
+        .mc-bars { display: flex; align-items: flex-end; gap: 3px; height: 60px; }
+        .mc-bar {
+            flex: 1; border-radius: 2px 2px 0 0;
+            background: linear-gradient(to top, rgba(250,204,21,0.2), var(--yellow));
+        }
+
+        /* FEATURES */
+        .section { padding: 100px 2rem; }
+        .section-inner { max-width: 1200px; margin: 0 auto; }
+        .section-header { text-align: center; margin-bottom: 64px; }
+        .section-header h2 {
+            font-size: clamp(1.75rem, 3vw, 2.5rem);
+            font-weight: 800; letter-spacing: -0.02em;
+            color: #fff; margin: 0 0 1rem;
+        }
+        .section-header p { color: #71717a; font-size: 1rem; max-width: 500px; margin: 0 auto; }
+
+        .features-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+            background: var(--border); border-radius: 16px; overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .feature-card {
+            background: var(--bg); padding: 2rem;
+            transition: background 0.25s;
+            position: relative; overflow: hidden;
+        }
+        .feature-card::before {
+            content: ''; position: absolute;
+            top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--yellow), transparent);
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .feature-card:hover { background: var(--surface); }
+        .feature-card:hover::before { opacity: 1; }
+
+        .feature-icon {
+            width: 48px; height: 48px; border-radius: 12px;
+            background: rgba(250,204,21,0.08); border: 1px solid rgba(250,204,21,0.15);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.25rem; margin-bottom: 1.25rem;
+            transition: background 0.25s, transform 0.25s;
+        }
+        .feature-card:hover .feature-icon {
+            background: rgba(250,204,21,0.15); transform: scale(1.05);
+        }
+        .feature-card h3 { font-size: 1rem; font-weight: 700; color: #fff; margin: 0 0 0.5rem; }
+        .feature-card p  { font-size: 0.875rem; color: #52525b; line-height: 1.65; margin: 0; }
+
+        /* MODULES */
+        .modules-section {
+            padding: 100px 2rem;
+            background: var(--bg2);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        .modules-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+        .modules-text h2 { font-size: clamp(1.75rem, 3vw, 2.25rem); font-weight: 800; letter-spacing: -0.02em; color: #fff; margin: 0 0 1rem; }
+        .modules-text p  { color: #71717a; line-height: 1.75; margin: 0 0 2rem; }
+
+        .modules-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .module-pill {
+            display: flex; align-items: center; gap: 10px;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; padding: 12px 16px;
+            font-size: 0.875rem; color: #a1a1aa;
+            transition: border-color 0.2s, color 0.2s, transform 0.2s;
+            cursor: default;
+        }
+        .module-pill:hover {
+            border-color: rgba(250,204,21,0.25); color: var(--yellow);
+            transform: translateX(3px);
+        }
+        .module-pill-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--yellow); flex-shrink: 0; }
+
+        /* CTA */
+        .cta-section { padding: 100px 2rem; }
+        .cta-inner { max-width: 800px; margin: 0 auto; text-align: center; }
+        .cta-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px; padding: 64px 48px;
+            position: relative; overflow: hidden;
+        }
+        .cta-glow {
+            position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
+            width: 400px; height: 200px; border-radius: 50%;
+            background: radial-gradient(ellipse, rgba(250,204,21,0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .cta-icon {
+            width: 64px; height: 64px; border-radius: 16px;
+            background: var(--yellow); margin: 0 auto 1.5rem;
+            display: flex; align-items: center; justify-content: center; font-size: 1.75rem;
+        }
+        .cta-box h2 { font-size: clamp(1.75rem, 3vw, 2.25rem); font-weight: 800; letter-spacing: -0.02em; color: #fff; margin: 0 0 1rem; }
+        .cta-box p  { color: #71717a; margin: 0 0 2rem; line-height: 1.75; }
+
+        /* FOOTER */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 2rem;
+        }
+        .footer-inner {
+            max-width: 1200px; margin: 0 auto;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .footer-inner p { font-size: 0.8rem; color: #3f3f46; margin: 0; }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .hero-grid    { grid-template-columns: 1fr; gap: 48px; }
+            .mockup       { display: none; }
+            .features-grid { grid-template-columns: 1fr 1fr; }
+            .modules-inner { grid-template-columns: 1fr; gap: 40px; }
+            nav           { display: none; }
+        }
+        @media (max-width: 600px) {
+            .features-grid { grid-template-columns: 1fr; }
+            .modules-grid  { grid-template-columns: 1fr; }
+            .stats-strip   { gap: 1.5rem; }
+            .cta-box       { padding: 40px 24px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+        }
+    </style>
 </head>
 
+<body>
 
-<body class="min-h-screen bg-[#09090b] text-white antialiased">
-
-
-{{-- ================================================================
-     NAVBAR
-================================================================ --}}
-
-<header
-    class="
-        fixed
-        inset-x-0
-        top-0
-        z-50
-        border-b
-        border-white/5
-        bg-[#09090b]/90
-        backdrop-blur-xl
-    "
->
-
-    <div
-        class="
-            mx-auto
-            flex
-            h-20
-            max-w-7xl
-            items-center
-            justify-between
-            px-6
-            lg:px-8
-        "
-    >
-
-        {{-- LOGO --}}
-
-        <a
-            href="{{ url('/') }}"
-            class="flex items-center gap-3"
-        >
-
-            <div
-                class="
-                    flex
-                    h-10
-                    w-10
-                    items-center
-                    justify-center
-                    rounded-xl
-                    bg-yellow-400
-                    text-black
-                    shadow-lg
-                    shadow-yellow-400/10
-                "
-            >
-
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-6 w-6"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.8"
-                >
-                    <path d="M2 10l10-5 10 5-10 5L2 10z"/>
-                    <path d="M6 12.5V17c3 2 9 2 12 0v-4.5"/>
-                    <path d="M22 10v6"/>
-                </svg>
-
+{{-- NAVBAR --}}
+<header class="navbar">
+    <div class="navbar-inner">
+        <a href="{{ url('/') }}" class="brand">
+            <div class="brand-icon">
+                <img src="{{ asset('favicon-192x192.png') }}" alt="ClassHub">
             </div>
-
-
             <div>
-
-                <div
-                    class="
-                        text-sm
-                        font-bold
-                        tracking-wide
-                        text-white
-                    "
-                >
-                    {{ config('app.name', 'ACADEMY') }}
-                </div>
-
-                <div
-                    class="
-                        text-xs
-                        font-medium
-                        text-yellow-400
-                    "
-                >
-                    GESTIÓN ACADÉMICA
-                </div>
-
+                <div class="brand-name">{{ config('app.name', 'ClassHub') }}</div>
+                <div class="brand-sub">Gestión Académica</div>
             </div>
-
         </a>
 
-
-        {{-- NAVEGACIÓN --}}
-
-        <nav class="hidden items-center gap-8 md:flex">
-
-            <a
-                href="#caracteristicas"
-                class="
-                    text-sm
-                    text-zinc-400
-                    transition
-                    hover:text-white
-                "
-            >
-                Características
-            </a>
-
-            <a
-                href="#modulos"
-                class="
-                    text-sm
-                    text-zinc-400
-                    transition
-                    hover:text-white
-                "
-            >
-                Módulos
-            </a>
-
-            <a
-                href="#plataforma"
-                class="
-                    text-sm
-                    text-zinc-400
-                    transition
-                    hover:text-white
-                "
-            >
-                Plataforma
-            </a>
-
+        <nav style="display:flex;align-items:center;gap:2rem;">
+            <a href="#caracteristicas">Características</a>
+            <a href="#modulos">Módulos</a>
+            <a href="#plataforma">Plataforma</a>
         </nav>
 
-
-        {{-- =========================================================
-             AUTENTICACIÓN
-        ========================================================== --}}
-
-        <div class="flex items-center gap-3">
-
+        <div style="display:flex;align-items:center;gap:10px;">
             @auth
-
-                {{-- PANEL --}}
-
-                <a
-                    href="{{ filament()->getUrl() }}"
-                    class="
-                        hidden
-                        rounded-lg
-                        border
-                        border-white/10
-                        px-4
-                        py-2
-                        text-sm
-                        font-medium
-                        text-zinc-200
-                        transition
-                        hover:border-yellow-400/30
-                        hover:bg-white/5
-                        hover:text-yellow-400
-                        sm:inline-flex
-                    "
-                >
-                    Panel
-                </a>
-
-
-                {{-- LOGOUT --}}
-
-                <form
-                    method="POST"
-                    action="{{ filament()->getLogoutUrl() }}"
-                >
-
+                <a href="{{ filament()->getUrl() }}" class="btn-ghost">Panel</a>
+                <form method="POST" action="{{ filament()->getLogoutUrl() }}" style="margin:0;">
                     @csrf
-
-                    <button
-                        type="submit"
-                        class="
-                            rounded-lg
-                            bg-yellow-400
-                            px-4
-                            py-2
-                            text-sm
-                            font-bold
-                            text-black
-                            transition
-                            hover:bg-yellow-300
-                            focus:outline-none
-                            focus:ring-2
-                            focus:ring-yellow-400/50
-                        "
-                    >
-                        Cerrar sesión
-                    </button>
-
+                    <button type="submit" class="btn-primary">Cerrar sesión</button>
                 </form>
-
             @else
-
-                {{-- LOGIN --}}
-
-                <a
-                    href="{{ filament()->getLoginUrl() }}"
-                    class="
-                        rounded-lg
-                        bg-yellow-400
-                        px-5
-                        py-2.5
-                        text-sm
-                        font-bold
-                        text-black
-                        shadow-lg
-                        shadow-yellow-400/10
-                        transition
-                        hover:bg-yellow-300
-                        hover:shadow-yellow-400/20
-                    "
-                >
-                    Iniciar sesión
-                </a>
-
+                <a href="{{ filament()->getLoginUrl() }}" class="btn-primary">Iniciar sesión</a>
             @endauth
-
         </div>
-
     </div>
-
 </header>
-
-
-
-{{-- ================================================================
-     HERO
-================================================================ --}}
 
 <main>
 
-<section
-    class="
-        relative
-        isolate
-        overflow-hidden
-        pt-32
-        lg:pt-40
-    "
->
+{{-- HERO --}}
+<section class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-grid">
 
-    {{-- Glow --}}
-
-    <div
-        class="
-            absolute
-            left-1/2
-            top-20
-            -z-10
-            h-[500px]
-            w-[800px]
-            -translate-x-1/2
-            rounded-full
-            bg-yellow-400/5
-            blur-3xl
-        "
-    ></div>
-
-
-    <div
-        class="
-            mx-auto
-            max-w-7xl
-            px-6
-            lg:px-8
-        "
-    >
-
-        <div
-            class="
-                grid
-                items-center
-                gap-16
-                lg:grid-cols-2
-            "
-        >
-
-            {{-- =====================================================
-                 TEXTO
-            ====================================================== --}}
-
-            <div>
-
-                <div
-                    class="
-                        mb-6
-                        inline-flex
-                        items-center
-                        gap-2
-                        rounded-full
-                        border
-                        border-yellow-400/20
-                        bg-yellow-400/5
-                        px-3
-                        py-1.5
-                        text-xs
-                        font-medium
-                        text-yellow-400
-                    "
-                >
-
-                    <span
-                        class="
-                            h-1.5
-                            w-1.5
-                            rounded-full
-                            bg-yellow-400
-                        "
-                    ></span>
-
-                    Plataforma de gestión académica
-
-                </div>
-
-
-                <h1
-                    class="
-                        max-w-3xl
-                        text-5xl
-                        font-bold
-                        tracking-tight
-                        text-white
-                        sm:text-6xl
-                        lg:text-7xl
-                    "
-                >
-
-                    Todo tu sistema
-
-                    <span class="text-yellow-400">
-                        académico
-                    </span>
-
-                    en un solo lugar.
-
-                </h1>
-
-
-                <p
-                    class="
-                        mt-6
-                        max-w-xl
-                        text-lg
-                        leading-8
-                        text-zinc-400
-                    "
-                >
-                    Administra estudiantes, profesores, materias,
-                    calificaciones, tareas, grupos, horarios e
-                    inscripciones desde una plataforma moderna,
-                    rápida y organizada.
-                </p>
-
-
-                {{-- BOTONES --}}
-
-                <div
-                    class="
-                        mt-10
-                        flex
-                        flex-wrap
-                        gap-4
-                    "
-                >
-
-                    @auth
-
-                        <a
-                            href="{{ filament()->getUrl() }}"
-                            class="
-                                inline-flex
-                                items-center
-                                gap-2
-                                rounded-xl
-                                bg-yellow-400
-                                px-6
-                                py-3.5
-                                text-sm
-                                font-bold
-                                text-black
-                                transition
-                                hover:bg-yellow-300
-                            "
-                        >
-
-                            Ir al panel
-
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                class="h-4 w-4"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                            >
-                                <path d="M5 12h14"/>
-                                <path d="m13 6 6 6-6 6"/>
-                            </svg>
-
-                        </a>
-
-                    @else
-
-                        <a
-                            href="{{ filament()->getLoginUrl() }}"
-                            class="
-                                inline-flex
-                                items-center
-                                gap-2
-                                rounded-xl
-                                bg-yellow-400
-                                px-6
-                                py-3.5
-                                text-sm
-                                font-bold
-                                text-black
-                                transition
-                                hover:bg-yellow-300
-                            "
-                        >
-
-                            Acceder a la plataforma
-
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                class="h-4 w-4"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                            >
-                                <path d="M5 12h14"/>
-                                <path d="m13 6 6 6-6 6"/>
-                            </svg>
-
-                        </a>
-
-                    @endauth
-
-
-                    <a
-                        href="#modulos"
-                        class="
-                            inline-flex
-                            items-center
-                            rounded-xl
-                            border
-                            border-white/10
-                            bg-white/[0.02]
-                            px-6
-                            py-3.5
-                            text-sm
-                            font-medium
-                            text-zinc-300
-                            transition
-                            hover:border-white/20
-                            hover:bg-white/5
-                            hover:text-white
-                        "
-                    >
-                        Explorar módulos
-                    </a>
-
-                </div>
-
+        <div>
+            <div class="hero-badge anim-fadeup delay-1">
+                <span class="badge-dot"></span>
+                Plataforma académica moderna
             </div>
 
-
-
-            {{-- =====================================================
-                 PREVIEW DEL PANEL
-            ====================================================== --}}
-
-            <div class="relative">
-
-                <div
-                    class="
-                        absolute
-                        -inset-4
-                        rounded-3xl
-                        bg-yellow-400/5
-                        blur-2xl
-                    "
-                ></div>
-
-
-                <div
-                    class="
-                        relative
-                        overflow-hidden
-                        rounded-2xl
-                        border
-                        border-white/10
-                        bg-[#111113]
-                        shadow-2xl
-                        shadow-black/50
-                    "
-                >
-
-                    {{-- Barra superior --}}
-
-                    <div
-                        class="
-                            flex
-                            h-12
-                            items-center
-                            gap-2
-                            border-b
-                            border-white/5
-                            bg-[#151517]
-                            px-4
-                        "
-                    >
-
-                        <span
-                            class="
-                                h-3
-                                w-3
-                                rounded-full
-                                bg-red-500/70
-                            "
-                        ></span>
-
-                        <span
-                            class="
-                                h-3
-                                w-3
-                                rounded-full
-                                bg-yellow-400/70
-                            "
-                        ></span>
-
-                        <span
-                            class="
-                                h-3
-                                w-3
-                                rounded-full
-                                bg-green-500/70
-                            "
-                        ></span>
-
-
-                        <div
-                            class="
-                                ml-4
-                                h-6
-                                flex-1
-                                rounded-md
-                                bg-white/5
-                            "
-                        ></div>
-
-                    </div>
-
-
-
-                    <div class="flex min-h-[390px]">
-
-                        {{-- SIDEBAR --}}
-
-                        <aside
-                            class="
-                                hidden
-                                w-44
-                                border-r
-                                border-white/5
-                                bg-[#0d0d0f]
-                                p-3
-                                sm:block
-                            "
-                        >
-
-                            <div
-                                class="
-                                    mb-5
-                                    flex
-                                    items-center
-                                    gap-2
-                                    px-2
-                                "
-                            >
-
-                                <div
-                                    class="
-                                        flex
-                                        h-6
-                                        w-6
-                                        items-center
-                                        justify-center
-                                        rounded-md
-                                        bg-yellow-400
-                                        text-black
-                                    "
-                                >
-                                    🎓
-                                </div>
-
-                                <span
-                                    class="
-                                        text-xs
-                                        font-bold
-                                    "
-                                >
-                                    ACADEMY
-                                </span>
-
-                            </div>
-
-
-                            @php
-
-                                $menu = [
-
-                                    '⌂' => 'Escritorio',
-
-                                    '▦' => 'Horarios de clases',
-
-                                    '✓' => 'Inscripciones',
-
-                                    '□' => 'Eventos',
-
-                                    '◇' => 'Grados',
-
-                                    '♧' => 'Grupos',
-
-                                    '▥' => 'Calificaciones',
-
-                                    '♙' => 'Estudiantes',
-
-                                    '▤' => 'Materias',
-
-                                    '↑' => 'Entregas de tareas',
-
-                                    '☷' => 'Tareas',
-
-                                    '⌘' => 'Profesores',
-
-                                ];
-
-                            @endphp
-
-
-                            <div class="space-y-1">
-
-                                @foreach($menu as $icon => $label)
-
-                                    <div
-                                        class="
-                                            flex
-                                            items-center
-                                            gap-2
-                                            rounded-md
-                                            px-2
-                                            py-2
-                                            text-[9px]
-
-                                            {{ $label === 'Estudiantes'
-                                                ? 'bg-yellow-400/10 text-yellow-400'
-                                                : 'text-zinc-500'
-                                            }}
-                                        "
-                                    >
-
-                                        <span
-                                            class="
-                                                flex
-                                                h-4
-                                                w-4
-                                                items-center
-                                                justify-center
-                                            "
-                                        >
-                                            {{ $icon }}
-                                        </span>
-
-                                        {{ $label }}
-
-                                    </div>
-
-                                @endforeach
-
-                            </div>
-
-                        </aside>
-
-
-
-                        {{-- CONTENIDO --}}
-
-                        <div class="flex-1 p-5">
-
-                            <div
-                                class="
-                                    mb-5
-                                    flex
-                                    items-center
-                                    justify-between
-                                "
-                            >
-
-                                <div>
-
-                                    <div
-                                        class="
-                                            text-[10px]
-                                            text-zinc-500
-                                        "
-                                    >
-                                        Gestión académica
-                                    </div>
-
-                                    <div
-                                        class="
-                                            mt-1
-                                            text-lg
-                                            font-bold
-                                        "
-                                    >
-                                        Estudiantes
-                                    </div>
-
-                                </div>
-
-
-                                <div
-                                    class="
-                                        h-8
-                                        w-8
-                                        rounded-full
-                                        bg-yellow-400/10
-                                    "
-                                ></div>
-
-                            </div>
-
-
-
-                            {{-- CARDS --}}
-
-                            <div
-                                class="
-                                    grid
-                                    grid-cols-2
-                                    gap-3
-                                    sm:grid-cols-3
-                                "
-                            >
-
-                                <div
-                                    class="
-                                        rounded-xl
-                                        border
-                                        border-white/5
-                                        bg-white/[0.02]
-                                        p-3
-                                    "
-                                >
-
-                                    <div
-                                        class="
-                                            text-[9px]
-                                            text-zinc-500
-                                        "
-                                    >
-                                        Estudiantes
-                                    </div>
-
-                                    <div
-                                        class="
-                                            mt-2
-                                            text-xl
-                                            font-bold
-                                        "
-                                    >
-                                        1,248
-                                    </div>
-
-                                    <div
-                                        class="
-                                            mt-1
-                                            text-[8px]
-                                            text-green-400
-                                        "
-                                    >
-                                        +12.5%
-                                    </div>
-
-                                </div>
-
-
-                                <div
-                                    class="
-                                        rounded-xl
-                                        border
-                                        border-white/5
-                                        bg-white/[0.02]
-                                        p-3
-                                    "
-                                >
-
-                                    <div
-                                        class="
-                                            text-[9px]
-                                            text-zinc-500
-                                        "
-                                    >
-                                        Profesores
-                                    </div>
-
-                                    <div
-                                        class="
-                                            mt-2
-                                            text-xl
-                                            font-bold
-                                        "
-                                    >
-                                        86
-                                    </div>
-
-                                    <div
-                                        class="
-                                            mt-1
-                                            text-[8px]
-                                            text-green-400
-                                        "
-                                    >
-                                        +4.2%
-                                    </div>
-
-                                </div>
-
-
-                                <div
-                                    class="
-                                        rounded-xl
-                                        border
-                                        border-yellow-400/10
-                                        bg-yellow-400/[0.03]
-                                        p-3
-                                    "
-                                >
-
-                                    <div
-                                        class="
-                                            text-[9px]
-                                            text-zinc-500
-                                        "
-                                    >
-                                        Calificación
-                                    </div>
-
-                                    <div
-                                        class="
-                                            mt-2
-                                            text-xl
-                                            font-bold
-                                            text-yellow-400
-                                        "
-                                    >
-                                        87.4%
-                                    </div>
-
-                                    <div
-                                        class="
-                                            mt-1
-                                            text-[8px]
-                                            text-green-400
-                                        "
-                                    >
-                                        +3.8%
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-
-
-                            {{-- GRÁFICA --}}
-
-                            <div
-                                class="
-                                    mt-4
-                                    rounded-xl
-                                    border
-                                    border-white/5
-                                    bg-white/[0.02]
-                                    p-4
-                                "
-                            >
-
-                                <div
-                                    class="
-                                        mb-4
-                                        text-[10px]
-                                        font-medium
-                                        text-zinc-400
-                                    "
-                                >
-                                    Rendimiento académico
-                                </div>
-
-
-                                <div
-                                    class="
-                                        flex
-                                        h-28
-                                        items-end
-                                        gap-2
-                                    "
-                                >
-
-                                    @foreach([
-                                        35,
-                                        48,
-                                        42,
-                                        65,
-                                        55,
-                                        72,
-                                        68,
-                                        85,
-                                        76,
-                                        92,
-                                        82,
-                                        96
-                                    ] as $height)
-
-                                        <div
-                                            class="
-                                                flex-1
-                                                rounded-t
-                                                bg-gradient-to-t
-                                                from-yellow-500/20
-                                                to-yellow-400
-                                            "
-                                            style="
-                                                height: {{ $height }}%;
-                                            "
-                                        ></div>
-
-                                    @endforeach
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-
-{{-- ================================================================
-     CARACTERÍSTICAS
-================================================================ --}}
-
-<section
-    id="caracteristicas"
-    class="
-        border-t
-        border-white/5
-        py-24
-    "
->
-
-    <div
-        class="
-            mx-auto
-            max-w-7xl
-            px-6
-            lg:px-8
-        "
-    >
-
-        <div
-            class="
-                mx-auto
-                max-w-2xl
-                text-center
-            "
-        >
-
-            <div
-                class="
-                    text-sm
-                    font-semibold
-                    text-yellow-400
-                "
-            >
-                TODO CENTRALIZADO
-            </div>
-
-
-            <h2
-                class="
-                    mt-3
-                    text-3xl
-                    font-bold
-                    tracking-tight
-                    sm:text-4xl
-                "
-            >
-                Diseñado para instituciones modernas
-            </h2>
-
-
-            <p
-                class="
-                    mt-4
-                    text-zinc-400
-                "
-            >
-                Una solución completa para administrar
-                todos los procesos académicos.
+            <h1 class="anim-fadeup delay-2">
+                Administra tu institución <em>sin complicaciones</em>
+            </h1>
+
+            <p class="anim-fadeup delay-3">
+                Estudiantes, profesores, horarios, calificaciones y más — todo centralizado en un solo sistema rápido y organizado.
             </p>
 
+            <div class="hero-cta anim-fadeup delay-4">
+                @auth
+                    <a href="{{ filament()->getUrl() }}" class="btn-primary">
+                        Ir al panel
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+                    </a>
+                @else
+                    <a href="{{ filament()->getLoginUrl() }}" class="btn-primary">
+                        Acceder ahora
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+                    </a>
+                @endauth
+                <a href="#modulos" class="btn-ghost">Ver módulos</a>
+            </div>
+
+            <div class="stats-strip anim-fadeup delay-5">
+                <div class="stat-item">
+                    <div class="stat-num">13<span>+</span></div>
+                    <div class="stat-label">Módulos integrados</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-num">100<span>%</span></div>
+                    <div class="stat-label">En español</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-num">1<span>k+</span></div>
+                    <div class="stat-label">Registros gestionados</div>
+                </div>
+            </div>
         </div>
 
+        {{-- MOCKUP --}}
+        <div class="anim-fadein delay-3">
+            <div class="mockup">
+                <div class="mockup-bar">
+                    <span class="dot dot-r"></span>
+                    <span class="dot dot-y"></span>
+                    <span class="dot dot-g"></span>
+                    <div class="mockup-url"></div>
+                </div>
+                <div class="mockup-body">
+                    <div class="mockup-sidebar">
+                        <div class="sidebar-brand">
+                            <div class="sidebar-logo">🎓</div>
+                            <span class="sidebar-name">ClassHub</span>
+                        </div>
+                        @php $items = ['Escritorio','Horarios','Inscripciones','Eventos','Grados','Grupos','Calificaciones','Estudiantes','Materias','Tareas','Profesores']; @endphp
+                        @foreach($items as $item)
+                            <div class="sidebar-item {{ $item === 'Estudiantes' ? 'active' : '' }}">
+                                <span class="sidebar-dot"></span>{{ $item }}
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="mockup-content">
+                        <div class="mc-header">
+                            <div class="mc-label">Gestión académica</div>
+                            <div class="mc-title">Estudiantes</div>
+                        </div>
+                        <div class="mc-cards">
+                            <div class="mc-card">
+                                <div class="mc-card-label">Estudiantes</div>
+                                <div class="mc-card-val">1,248</div>
+                                <div class="mc-card-change">+12.5%</div>
+                            </div>
+                            <div class="mc-card">
+                                <div class="mc-card-label">Profesores</div>
+                                <div class="mc-card-val">86</div>
+                                <div class="mc-card-change">+4.2%</div>
+                            </div>
+                            <div class="mc-card accent">
+                                <div class="mc-card-label">Promedio</div>
+                                <div class="mc-card-val">87.4%</div>
+                                <div class="mc-card-change">+3.8%</div>
+                            </div>
+                        </div>
+                        <div class="mc-chart">
+                            <div class="mc-chart-label">Rendimiento académico</div>
+                            <div class="mc-bars">
+                                @foreach([35,48,42,65,55,72,68,85,76,92,82,96] as $h)
+                                    <div class="mc-bar" style="height:{{ $h }}%"></div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+    </div>
+</section>
 
-        <div
-            class="
-                mx-auto
-                mt-16
-                grid
-                max-w-5xl
-                grid-cols-1
-                gap-4
-                sm:grid-cols-2
-                lg:grid-cols-3
-            "
-        >
+{{-- CARACTERÍSTICAS --}}
+<section class="section" id="caracteristicas" style="border-top:1px solid var(--border);">
+    <div class="section-inner">
+        <div class="section-header">
+            <h2>Todo lo que tu institución necesita</h2>
+            <p>Una plataforma completa para administrar cada proceso académico desde un solo lugar.</p>
+        </div>
 
+        <div class="features-grid">
             @php
-
-                $features = [
-
-                    [
-                        'icon' => '👥',
-                        'title' => 'Estudiantes',
-                        'description' =>
-                            'Gestiona perfiles, información académica y registros de cada estudiante.',
-                    ],
-
-                    [
-                        'icon' => '📊',
-                        'title' => 'Calificaciones',
-                        'description' =>
-                            'Controla notas, evaluaciones y rendimiento académico.',
-                    ],
-
-                    [
-                        'icon' => '🎓',
-                        'title' => 'Profesores',
-                        'description' =>
-                            'Administra profesores, asignaciones y responsabilidades.',
-                    ],
-
-                    [
-                        'icon' => '📚',
-                        'title' => 'Materias',
-                        'description' =>
-                            'Organiza materias, grados, grupos y horarios.',
-                    ],
-
-                    [
-                        'icon' => '✓',
-                        'title' => 'Tareas',
-                        'description' =>
-                            'Crea tareas y controla las entregas de los estudiantes.',
-                    ],
-
-                    [
-                        'icon' => '📅',
-                        'title' => 'Eventos',
-                        'description' =>
-                            'Mantén organizada toda la agenda académica.',
-                    ],
-
-                ];
-
+            $features = [
+                ['icon'=>'👥','title'=>'Estudiantes','desc'=>'Perfiles completos, historial académico y seguimiento por período.'],
+                ['icon'=>'🎓','title'=>'Profesores','desc'=>'Gestión de docentes, asignaciones por materia y grupo.'],
+                ['icon'=>'📊','title'=>'Calificaciones','desc'=>'Notas, evaluaciones y rendimiento en tiempo real.'],
+                ['icon'=>'📚','title'=>'Materias','desc'=>'Catálogo de materias por grado con horarios asignados.'],
+                ['icon'=>'✅','title'=>'Tareas','desc'=>'Crea entregas, revisa avances y controla fechas límite.'],
+                ['icon'=>'📅','title'=>'Eventos','desc'=>'Agenda académica centralizada para toda la institución.'],
+            ];
             @endphp
-
-
-            @foreach($features as $feature)
-
-                <div
-                    class="
-                        group
-                        rounded-2xl
-                        border
-                        border-white/5
-                        bg-[#111113]
-                        p-6
-                        transition
-                        duration-300
-                        hover:-translate-y-1
-                        hover:border-yellow-400/20
-                        hover:bg-[#151517]
-                    "
-                >
-
-                    <div
-                        class="
-                            mb-5
-                            flex
-                            h-11
-                            w-11
-                            items-center
-                            justify-center
-                            rounded-xl
-                            bg-yellow-400/10
-                            text-xl
-                            transition
-                            group-hover:bg-yellow-400
-                        "
-                    >
-                        {{ $feature['icon'] }}
-                    </div>
-
-
-                    <h3
-                        class="
-                            font-semibold
-                            text-white
-                        "
-                    >
-                        {{ $feature['title'] }}
-                    </h3>
-
-
-                    <p
-                        class="
-                            mt-2
-                            text-sm
-                            leading-6
-                            text-zinc-500
-                        "
-                    >
-                        {{ $feature['description'] }}
-                    </p>
-
-                </div>
-
+            @foreach($features as $f)
+            <div class="feature-card">
+                <div class="feature-icon">{{ $f['icon'] }}</div>
+                <h3>{{ $f['title'] }}</h3>
+                <p>{{ $f['desc'] }}</p>
+            </div>
             @endforeach
-
         </div>
-
     </div>
-
 </section>
 
-
-
-{{-- ================================================================
-     MÓDULOS
-================================================================ --}}
-
-<section
-    id="modulos"
-    class="
-        border-t
-        border-white/5
-        bg-[#0c0c0e]
-        py-24
-    "
->
-
-    <div
-        class="
-            mx-auto
-            max-w-7xl
-            px-6
-            lg:px-8
-        "
-    >
-
-        <div
-            class="
-                grid
-                items-center
-                gap-16
-                lg:grid-cols-2
-            "
-        >
-
-            <div>
-
-                <span
-                    class="
-                        text-sm
-                        font-semibold
-                        text-yellow-400
-                    "
-                >
-                    UNA PLATAFORMA COMPLETA
-                </span>
-
-
-                <h2
-                    class="
-                        mt-3
-                        text-3xl
-                        font-bold
-                        sm:text-4xl
-                    "
-                >
-                    Todo lo que necesitas
-                    para administrar tu institución.
-                </h2>
-
-
-                <p
-                    class="
-                        mt-5
-                        leading-7
-                        text-zinc-400
-                    "
-                >
-                    Desde la inscripción de estudiantes hasta
-                    sus calificaciones finales. Centraliza
-                    la información y simplifica el trabajo
-                    administrativo.
-                </p>
-
-            </div>
-
-
-
-            <div
-                class="
-                    grid
-                    grid-cols-2
-                    gap-3
-                "
-            >
-
-                @foreach([
-
-                    'Estudiantes',
-                    'Profesores',
-                    'Grupos',
-                    'Grados',
-                    'Materias',
-                    'Horarios',
-                    'Calificaciones',
-                    'Tareas',
-                    'Entregas',
-                    'Inscripciones',
-                    'Eventos',
-                    'Usuarios',
-
-                ] as $module)
-
-                    <div
-                        class="
-                            flex
-                            items-center
-                            gap-3
-                            rounded-xl
-                            border
-                            border-white/5
-                            bg-[#111113]
-                            px-4
-                            py-3
-                            text-sm
-                            text-zinc-300
-                            transition
-                            hover:border-yellow-400/20
-                            hover:text-yellow-400
-                        "
-                    >
-
-                        <span
-                            class="
-                                h-1.5
-                                w-1.5
-                                rounded-full
-                                bg-yellow-400
-                            "
-                        ></span>
-
-                        {{ $module }}
-
-                    </div>
-
-                @endforeach
-
-            </div>
-
+{{-- MÓDULOS --}}
+<section class="modules-section" id="modulos">
+    <div class="modules-inner">
+        <div class="modules-text">
+            <h2>13 módulos, una sola plataforma</h2>
+            <p>Desde la inscripción hasta las calificaciones finales. Cada proceso académico tiene su lugar, sin hojas de cálculo ni papeles sueltos.</p>
+            @auth
+                <a href="{{ filament()->getUrl() }}" class="btn-primary">Abrir panel</a>
+            @else
+                <a href="{{ filament()->getLoginUrl() }}" class="btn-primary">Comenzar</a>
+            @endauth
         </div>
-
+        <div class="modules-grid">
+            @foreach(['Estudiantes','Profesores','Grupos','Grados','Materias','Horarios de clases','Calificaciones','Tareas','Entregas de tareas','Inscripciones','Eventos','Usuarios','Roles y permisos'] as $m)
+            <div class="module-pill">
+                <span class="module-pill-dot"></span>{{ $m }}
+            </div>
+            @endforeach
+        </div>
     </div>
-
 </section>
 
-
-
-{{-- ================================================================
-     CTA
-================================================================ --}}
-
-<section
-    id="plataforma"
-    class="py-24"
->
-
-    <div
-        class="
-            mx-auto
-            max-w-5xl
-            px-6
-            lg:px-8
-        "
-    >
-
-        <div
-            class="
-                relative
-                overflow-hidden
-                rounded-3xl
-                border
-                border-yellow-400/10
-                bg-gradient-to-br
-                from-yellow-400/10
-                via-[#111113]
-                to-[#111113]
-                p-10
-                text-center
-                sm:p-16
-            "
-        >
-
-            <div
-                class="
-                    absolute
-                    left-1/2
-                    top-0
-                    h-40
-                    w-80
-                    -translate-x-1/2
-                    rounded-full
-                    bg-yellow-400/10
-                    blur-3xl
-                "
-            ></div>
-
-
-            <div class="relative">
-
-                <div
-                    class="
-                        mx-auto
-                        flex
-                        h-14
-                        w-14
-                        items-center
-                        justify-center
-                        rounded-2xl
-                        bg-yellow-400
-                        text-2xl
-                    "
-                >
-                    🎓
-                </div>
-
-
-                <h2
-                    class="
-                        mt-6
-                        text-3xl
-                        font-bold
-                        sm:text-4xl
-                    "
-                >
-                    Lleva tu institución
-                    al siguiente nivel.
-                </h2>
-
-
-                <p
-                    class="
-                        mx-auto
-                        mt-4
-                        max-w-xl
-                        text-zinc-400
-                    "
-                >
-                    Una experiencia administrativa moderna,
-                    organizada y construida para crecer contigo.
-                </p>
-
-
-                <div class="mt-8">
-
-                    @auth
-
-                        <a
-                            href="{{ filament()->getUrl() }}"
-                            class="
-                                inline-flex
-                                rounded-xl
-                                bg-yellow-400
-                                px-7
-                                py-3.5
-                                text-sm
-                                font-bold
-                                text-black
-                                transition
-                                hover:bg-yellow-300
-                            "
-                        >
-                            Abrir panel
-                        </a>
-
-                    @else
-
-                        <a
-                            href="{{ filament()->getLoginUrl() }}"
-                            class="
-                                inline-flex
-                                rounded-xl
-                                bg-yellow-400
-                                px-7
-                                py-3.5
-                                text-sm
-                                font-bold
-                                text-black
-                                transition
-                                hover:bg-yellow-300
-                            "
-                        >
-                            Iniciar sesión
-                        </a>
-
-                    @endauth
-
-                </div>
-
+{{-- CTA --}}
+<section class="cta-section" id="plataforma">
+    <div class="cta-inner">
+        <div class="cta-box">
+            <div class="cta-glow"></div>
+            <div style="position:relative;">
+                <div class="cta-icon">🎓</div>
+                <h2>Tu institución, organizada desde hoy</h2>
+                <p>Una experiencia administrativa moderna, construida para crecer con tu institución.</p>
+                @auth
+                    <a href="{{ filament()->getUrl() }}" class="btn-primary" style="font-size:1rem;padding:0.875rem 2rem;">Ir al panel</a>
+                @else
+                    <a href="{{ filament()->getLoginUrl() }}" class="btn-primary" style="font-size:1rem;padding:0.875rem 2rem;">Iniciar sesión</a>
+                @endauth
             </div>
-
         </div>
-
     </div>
-
 </section>
 
 </main>
 
-
-
-{{-- ================================================================
-     FOOTER
-================================================================ --}}
-
-<footer
-    class="
-        border-t
-        border-white/5
-    "
->
-
-    <div
-        class="
-            mx-auto
-            flex
-            max-w-7xl
-            flex-col
-            items-center
-            justify-between
-            gap-4
-            px-6
-            py-8
-            sm:flex-row
-            lg:px-8
-        "
-    >
-
-        <div
-            class="
-                text-sm
-                text-zinc-600
-            "
-        >
-
-            © {{ date('Y') }}
-
-            {{ config('app.name', 'Filament Academy') }}
-
-        </div>
-
-
-        <div
-            class="
-                text-xs
-                text-zinc-700
-            "
-        >
-            Laravel · Filament
-        </div>
-
+<footer>
+    <div class="footer-inner">
+        <p>© {{ date('Y') }} {{ config('app.name', 'ClassHub') }} — Gestión Académica</p>
+        <p>Laravel · Filament</p>
     </div>
-
 </footer>
-
 
 </body>
 </html>

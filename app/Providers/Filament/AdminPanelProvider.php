@@ -28,7 +28,10 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-
+            ->favicon(asset('favicon.ico'))
+            ->brandName('ClassHub')
+            ->brandLogo(asset('favicon-512x512.png'))
+            ->brandLogoHeight('2.5rem')
             ->plugins([
                 FilamentShieldPlugin::make(),
             ])
