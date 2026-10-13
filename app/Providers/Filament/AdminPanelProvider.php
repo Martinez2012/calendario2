@@ -61,10 +61,9 @@ class AdminPanelProvider extends PanelProvider
             )
 
             ->widgets([
-                AccountWidget::class,
-                // FilamentInfoWidget::class,
-            ])
-
+            AccountWidget::class,
+            \App\Filament\Widgets\CalendarioWidget::class,
+])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
