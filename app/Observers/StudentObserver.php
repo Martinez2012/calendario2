@@ -9,22 +9,22 @@ class StudentObserver
 {
     public function created(Student $student): void
     {
-        $student->user?->assignRole('alumno');
+        $student->user?->assignRole('student');
     }
 
     public function updated(Student $student): void
     {
         if ($student->wasChanged('user_id')) {
             if ($student->getOriginal('user_id')) {
-                User::find($student->getOriginal('user_id'))?->removeRole('alumno');
+                User::find($student->getOriginal('user_id'))?->removeRole('student');
             }
 
-            $student->user?->assignRole('alumno');
+            $student->user?->assignRole('student');
         }
     }
 
     public function deleted(Student $student): void
     {
-        $student->user?->removeRole('alumno');
+        $student->user?->removeRole('student');
     }
 }

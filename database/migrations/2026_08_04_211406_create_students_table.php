@@ -19,6 +19,9 @@ return new class extends Migration
                 ->constrained()
                 ->cascadeOnDelete();
 
+            $table->string('document', 10)->nullable()
+                ->unique();
+
             $table->string('student_code')->unique();
 
             $table->date('birth_date')->nullable();

@@ -16,6 +16,10 @@ class Event extends Model
         'teacher_subject_group_id',
     ];
 
+    protected $casts = [
+            'start' => 'datetime',
+            'end' => 'datetime',
+        ];
 
     public function group()
     {
